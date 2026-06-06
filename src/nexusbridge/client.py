@@ -18,7 +18,7 @@ from nexusbridge.protocol import (
     register_payload,
     result_payload,
 )
-from nexusbridge.utils import dumps_message, loads_message
+from nexusbridge.utils import dumps_message, format_error, loads_message
 
 _log = logging.getLogger("nexusbridge.client")
 
@@ -46,6 +46,7 @@ class BridgeClient:
         user_id: str,
         metadata: dict[str, Any] | None = None,
         reconnect_delay: float = 5.0,
+        stop_event: asyncio.Event | None = None,
     ) -> None:
         self.server_url = server_url.rstrip("/")
         self.token = token
@@ -55,7 +56,7 @@ class BridgeClient:
         self.reconnect_delay = reconnect_delay
         self._handlers: dict[str, Handler | AsyncHandler] = {}
         self._conn: ClientConnection | None = None
-        self._stop = asyncio.Event()
+        self._stop = stop_event if stop_event is not None else asyncio.Event()
 
     def register(self, name: str, fn: Handler | AsyncHandler) -> None:
         self._handlers[name] = fn
@@ -110,32 +111,53 @@ class BridgeClient:
                 reply = BridgeMessage(
                     type=MessageType.RESULT,
                     request_id=msg.request_id,
-                    payload=result_payload(ok=False, error=str(exc)),
+                    payload=result_payload(ok=False, error=format_error(exc)),
                 )
-            await self._send(reply)
+            try:
+                await self._send(reply)
+            except Exception:
+                _log.exception("failed to send result for %s", fn)
         elif msg.type == MessageType.REGISTER_ACK:
             _log.info("registered: %s", msg.payload)
         elif msg.type == MessageType.PING:
             await self._send(BridgeMessage(type=MessageType.PONG, request_id=msg.request_id))
+        elif msg.type == MessageType.ERROR:
+            _log.warning("server error: %s", msg.payload.get("error", msg.payload))
+        else:
+            _log.debug("ignored message type: %s", msg.type)
 
     async def _session(self) -> None:
         headers = {"Authorization": f"Bearer {self.token}"}
-        async with websockets.connect(self.server_url, additional_headers=headers) as conn:
-            self._conn = conn
-            await self._register()
-            async for raw in conn:
-                msg = BridgeMessage.from_dict(loads_message(raw))
-                await self._handle_message(msg)
+        try:
+            async with websockets.connect(self.server_url, additional_headers=headers) as conn:
+                self._conn = conn
+                _log.info("connected project=%s user=%s", self.project_id, self.user_id)
+                await self._register()
+                async for raw in conn:
+                    try:
+                        msg = BridgeMessage.from_dict(loads_message(raw))
+                        await self._handle_message(msg)
+                    except asyncio.CancelledError:
+                        raise
+                    except Exception:
+                        _log.exception("failed to handle incoming message")
+        finally:
+            self._conn = None
+            _log.info("session ended project=%s user=%s", self.project_id, self.user_id)
 
     async def run(self) -> None:
-        """Connect loop with auto-reconnect."""
+        """Connect loop with auto-reconnect. Survives handler and transport errors."""
         while not self._stop.is_set():
             try:
                 await self._session()
+            except asyncio.CancelledError:
+                raise
             except websockets.ConnectionClosed as exc:
                 _log.warning("disconnected: %s", exc)
             except OSError as exc:
                 _log.warning("connection error: %s", exc)
+            except Exception:
+                _log.exception("unexpected session error")
             if self._stop.is_set():
                 break
             _log.info("reconnecting in %.1fs...", self.reconnect_delay)

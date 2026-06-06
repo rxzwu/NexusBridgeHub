@@ -4,14 +4,45 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nexusbridge"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Universal bridge for distributed bot control: bot -> server -> user worker"
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
-    {name = "rxzwu", email = "rxzwu@users.noreply.github.com"}
+    {name = "rxzwu", email = "gorexevidep023@gmail.com"}
 ]
-requires-python = ">=3.10"
+maintainers = [
+    {name = "rxzwu", email = "gorexevidep023@gmail.com"}
+]
+keywords = [
+    "websocket",
+    "bot",
+    "distributed",
+    "telegram",
+    "bridge",
+    "remote",
+    "worker",
+    "jwt",
+    "asyncio",
+]
+requires-python = ">=3.11"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Networking",
+    "Framework :: AsyncIO",
+    "Typing :: Typed",
+]
 dependencies = [
     "websockets>=13.0",
     "aiohttp>=3.9",
@@ -32,8 +63,10 @@ builder = [
 
 [project.urls]
 Homepage = "https://github.com/rxzwu/nexusbridge"
+Documentation = "https://github.com/rxzwu/nexusbridge/blob/main/README.ru.md"
 Repository = "https://github.com/rxzwu/nexusbridge"
 Issues = "https://github.com/rxzwu/nexusbridge/issues"
+Changelog = "https://github.com/rxzwu/nexusbridge/blob/main/CHANGELOG.md"
 
 [project.scripts]
 nexusbridge-server = "nexusbridge.server:main_cli"
@@ -42,6 +75,9 @@ nexusbridge-build = "nexusbridge.builder:main_cli"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.dynamic]
+version = {attr = "nexusbridge.__version__"}
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

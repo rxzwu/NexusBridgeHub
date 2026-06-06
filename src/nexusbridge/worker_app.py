@@ -14,7 +14,7 @@ import websockets
 from nexusbridge.client import BridgeClient
 from nexusbridge.crypto import deobfuscate_seed, decrypt_server_url
 from nexusbridge.protocol import BridgeMessage, MessageType
-from nexusbridge.utils import dumps_message, loads_message, setup_logging
+from nexusbridge.utils import dumps_message, format_error, loads_message, setup_logging
 
 _log = logging.getLogger("nexusbridge.worker_app")
 
@@ -42,6 +42,7 @@ class WorkerApp:
         token: str = "",
         pair_code: str = "",
         register_fn: Any = None,
+        reconnect_delay: float = 5.0,
     ) -> None:
         self._server_url = server_url
         self._encrypted = encrypted_server_url
@@ -51,6 +52,8 @@ class WorkerApp:
         self.token = token
         self.pair_code = pair_code
         self._register_fn = register_fn
+        self.reconnect_delay = reconnect_delay
+        self._stop = asyncio.Event()
 
     def resolve_server_url(self) -> str:
         if self._server_url:
@@ -80,9 +83,10 @@ class WorkerApp:
             self.token = str(reply.payload["token"])
             self.project_id = str(reply.payload.get("project_id", self.project_id))
             self.user_id = str(reply.payload.get("user_id", self.user_id))
+            _log.info("paired project=%s user=%s", self.project_id, self.user_id)
             return self.token
 
-    async def run(self) -> None:
+    async def _run_once(self) -> None:
         server_url = self.resolve_server_url()
         if not self.token:
             await self._pair_for_token(server_url)
@@ -93,6 +97,8 @@ class WorkerApp:
             project_id=self.project_id,
             user_id=self.user_id,
             metadata={"client": "nexusbridge-worker"},
+            reconnect_delay=self.reconnect_delay,
+            stop_event=self._stop,
         )
 
         if self._register_fn:
@@ -103,6 +109,23 @@ class WorkerApp:
 
         _log.info("worker starting project=%s user=%s", self.project_id, self.user_id)
         await bridge.run()
+
+    async def run(self) -> None:
+        """Run worker with auto-restart on fatal errors."""
+        while not self._stop.is_set():
+            try:
+                await self._run_once()
+            except asyncio.CancelledError:
+                raise
+            except Exception as exc:
+                _log.exception("worker stopped: %s", format_error(exc))
+            if self._stop.is_set():
+                break
+            _log.info("restarting worker in %.1fs...", self.reconnect_delay)
+            await asyncio.sleep(self.reconnect_delay)
+
+    def stop(self) -> None:
+        self._stop.set()
 
 
 def _load_embedded_config() -> tuple[str | None, bytes | None]:
@@ -144,4 +167,5 @@ def main_cli() -> None:
     try:
         asyncio.run(app.run())
     except KeyboardInterrupt:
-        pass
+        app.stop()
+        _log.info("worker stopped by user")

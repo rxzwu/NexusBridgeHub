@@ -9,6 +9,7 @@ import os
 from dataclasses import dataclass, field
 from typing import Any, Callable, Coroutine
 
+import jwt
 import websockets
 from websockets.asyncio.server import ServerConnection
 
@@ -196,48 +197,75 @@ class BridgeServer:
                     del self._controllers[key]
                     _log.info("controller offline project=%s user=%s", key[0], key[1])
 
+    async def _dispatch_message(self, conn: ServerConnection, msg: BridgeMessage, token: str) -> str:
+        if msg.type == MessageType.PING:
+            await self._send(conn, BridgeMessage(type=MessageType.PONG, request_id=msg.request_id))
+            return token
+
+        if msg.type == MessageType.PAIR_REQUEST:
+            await self._handle_pair_request(conn, msg)
+            return token
+
+        if msg.type == MessageType.REGISTER:
+            if not token:
+                token = str(msg.payload.get("token", ""))
+            if not token:
+                await self._send(
+                    conn,
+                    BridgeMessage(
+                        type=MessageType.ERROR,
+                        request_id=msg.request_id,
+                        payload={"error": "missing JWT token"},
+                    ),
+                )
+                return token
+            await self._handle_register(conn, msg, token)
+            return token
+
+        if msg.type == MessageType.INVOKE:
+            await self._handle_invoke(conn, msg)
+            return token
+
+        if msg.type == MessageType.RESULT:
+            await self._handle_result(msg)
+            return token
+
+        _log.debug("ignored message type: %s", msg.type)
+        return token
+
+    async def _send_error(self, conn: ServerConnection, *, request_id: str, error: str) -> None:
+        await self._send(
+            conn,
+            BridgeMessage(
+                type=MessageType.ERROR,
+                request_id=request_id,
+                payload={"error": error},
+            ),
+        )
+
     async def _handler(self, conn: ServerConnection) -> None:
         auth_header = conn.request.headers.get("Authorization", "")
         token = auth_header.removeprefix("Bearer ").strip() if auth_header else ""
         try:
             async for raw in conn:
-                data = loads_message(raw)
-                msg = BridgeMessage.from_dict(data)
-
-                if msg.type == MessageType.PING:
-                    await self._send(conn, BridgeMessage(type=MessageType.PONG, request_id=msg.request_id))
-                    continue
-
-                if msg.type == MessageType.PAIR_REQUEST:
-                    await self._handle_pair_request(conn, msg)
-                    continue
-
-                if msg.type == MessageType.REGISTER:
-                    if not token:
-                        token = str(msg.payload.get("token", ""))
-                    if not token:
-                        await self._send(
-                            conn,
-                            BridgeMessage(
-                                type=MessageType.ERROR,
-                                request_id=msg.request_id,
-                                payload={"error": "missing JWT token"},
-                            ),
-                        )
-                        continue
-                    await self._handle_register(conn, msg, token)
-                    continue
-
-                if msg.type == MessageType.INVOKE:
-                    await self._handle_invoke(conn, msg)
-                    continue
-
-                if msg.type == MessageType.RESULT:
-                    await self._handle_result(msg)
-                    continue
+                request_id = ""
+                try:
+                    data = loads_message(raw)
+                    request_id = str(data.get("request_id") or "")
+                    msg = BridgeMessage.from_dict(data)
+                    token = await self._dispatch_message(conn, msg, token)
+                except ValueError as exc:
+                    _log.warning("invalid message: %s", exc)
+                    await self._send_error(conn, request_id=request_id, error=str(exc))
+                except jwt.InvalidTokenError as exc:
+                    _log.warning("auth failed: %s", exc)
+                    await self._send_error(conn, request_id=request_id, error="invalid token")
+                except Exception:
+                    _log.exception("handler error")
+                    await self._send_error(conn, request_id=request_id, error="internal server error")
 
         except websockets.ConnectionClosed:
-            pass
+            _log.info("connection closed")
         finally:
             await self._cleanup_connection(conn)
 

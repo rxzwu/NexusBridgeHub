@@ -1,13 +1,29 @@
 # NexusBridge
 
+[![PyPI version](https://img.shields.io/pypi/v/nexusbridge)](https://pypi.org/project/nexusbridge/)
+[![Python 3.11–3.14](https://img.shields.io/badge/python-3.11--3.14-blue.svg)](https://pypi.org/project/nexusbridge/)
+[![Tests](https://github.com/rxzwu/nexusbridge/actions/workflows/ci.yml/badge.svg)](https://github.com/rxzwu/nexusbridge/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Universal bridge for distributed bot control: **bot → server → user worker**.
 
 Add a thin integration layer to any Python bot or automation project — keep your business logic local, control it remotely through a central server.
 
+> **Русская документация:** [README.ru.md](README.ru.md) · **Деплой на VPS:** [docs/DEPLOY.ru.md](docs/DEPLOY.ru.md) · **Проверка:** [docs/TESTING.ru.md](docs/TESTING.ru.md)
+
+## Python versions
+
+| Version | Status |
+|---------|--------|
+| **3.10 and below** | Not supported — `pip` will refuse to install |
+| **3.11 – 3.14** | Fully supported — every release is tested in CI on 3.11, 3.12, 3.13, and 3.14 |
+
+Requires **Python 3.11+**. Check your version: `python --version`.
+
 ## Architecture
 
 ```
-┌─────────────┐   JWT controller   ┌──────────────┐   JWT worker   ┌─────────────────┐
+┌─────────────┐   JWT controller  ┌──────────────┐   JWT worker   ┌─────────────────┐
 │ Telegram    │ ────────────────► │ NexusBridge  │ ◄───────────── │ User Worker App │
 │ Bot / API   │                   │   Server     │                │ (local runtime) │
 └─────────────┘                   └──────────────┘                └─────────────────┘
@@ -26,6 +42,13 @@ Add a thin integration layer to any Python bot or automation project — keep yo
 - **Pair codes** — bot generates 8-char code; user enters it in the worker app → receives JWT
 - **Encrypted server URL** — WSS address stored as AES-256-GCM blob with PBKDF2 key derivation + machine fingerprint (not plain text in `.exe`)
 - **Thin client build** — `nexusbridge-build` generates per-build seed; combine with PyInstaller + optional commercial obfuscators
+
+## Error handling and logging
+
+- A failing **handler** does not crash the worker — the error is returned as `ok: false` and the worker keeps running
+- **Auto-reconnect** on WebSocket drops (`BridgeClient`, `WorkerApp`)
+- **Invalid messages** are logged and skipped; the session stays alive
+- Log level: `NEXUSBRIDGE_LOG_LEVEL=DEBUG` (default `INFO`)
 
 ## Install
 
@@ -102,7 +125,7 @@ Each end user runs a worker app on their own machine:
 3. Bot sends `run_task`, `worker_status`, etc. → commands execute on **the user's machine**
 4. Local resources stay on the user's device — the bot only orchestrates
 
-See [`examples/worker_integration.py`](examples/worker_integration.py) for a minimal integration example.
+See [`examples/minimal/`](examples/minimal/) for a step-by-step RU/EN worker test, [`examples/worker_integration.py`](examples/worker_integration.py) (EN) or [`examples/worker_integration.ru.py`](examples/worker_integration.ru.py) (RU) for project integration stubs.
 
 ## Protocol
 
@@ -115,13 +138,20 @@ JSON messages over WebSocket:
 | `result` | worker → controller | Return value or error |
 | `pair_request` | worker → server | Redeem pair code for JWT |
 
+## Deployment
+
+Production guide (VPS, systemd, WSS, Hetzner/Contabo): [docs/DEPLOY.ru.md](docs/DEPLOY.ru.md)
+
 ## Development
 
 ```bash
 pip install -e ".[dev]"
 pytest
 python -m build   # PyPI wheel
+python -m twine check dist/*
 ```
+
+Release guide: [docs/PUBLISH.ru.md](docs/PUBLISH.ru.md)
 
 ## License
 

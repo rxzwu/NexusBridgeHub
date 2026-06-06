@@ -11,6 +11,14 @@ build/
 venv/
 .env
 .env.*
+.venv-test-311/
+.venv-test-312/
+.venv-test-313/
+.venv-test-314/
+.tmp-pytest-311/
+.tmp-pytest-312/
+.tmp-pytest-313/
+.tmp-pytest-314/
 
 # IDE / Obsidian
 .obsidian/
