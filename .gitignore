@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.venv/
+venv/
+.env
+.env.*
+
+# IDE / Obsidian
+.obsidian/
+.idea/
+.vscode/
+*.swp
+
+# Tests / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build artifacts
+*.spec
+worker_dist/
+*.exe
+
+# Secrets (never commit)
+*.pem
+*.key
+bridge_secret.txt
+
+# Local docs / build metadata
+Plan NexusBridgeSwag.md
