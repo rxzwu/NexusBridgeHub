@@ -1,13 +1,13 @@
-# Деплой NexusBridge на VPS (продакшен)
+# Деплой NexusBridgeHub на VPS (продакшен)
 
-Пошаговая инструкция: поднять **NexusBridge Server** на VPS (Hetzner, Contabo или любой Ubuntu/Debian) с HTTPS/WSS, автозапуском и firewall.
+Пошаговая инструкция: поднять **NexusBridgeHub Server** на VPS (Hetzner, Contabo или любой Ubuntu/Debian) с HTTPS/WSS, автозапуском и firewall.
 
 > Локальная проверка перед продом: [TESTING.ru.md](TESTING.ru.md)
 
 ## Что получится
 
 ```
-Интернет ──► VPS (443/wss) ──► Caddy/Nginx ──► nexusbridge-server (127.0.0.1:8765)
+Интернет ──► VPS (443/wss) ──► Caddy/Nginx ──► nexusbridgehub-server (127.0.0.1:8765)
                                               ▲
                     Telegram-бот (controller) ──┤
                     Worker на ПК пользователя ──┘
@@ -15,7 +15,7 @@
 
 | Компонент | Где крутится |
 |-----------|--------------|
-| `nexusbridge-server` | VPS |
+| `nexusbridgehub-server` | VPS |
 | Бот / `BridgeController` | VPS (рядом с ботом) или отдельный сервер |
 | `BridgeClient` / worker | Машина пользователя |
 
@@ -54,15 +54,15 @@ ssh root@YOUR_VPS_IP
 Создай пользователя (не работай от root):
 
 ```bash
-adduser nexusbridge
-usermod -aG sudo nexusbridge
-rsync --archive --chown=nexusbridge:nexusbridge ~/.ssh /home/nexusbridge
+adduser nexusbridgehub
+usermod -aG sudo nexusbridgehub
+rsync --archive --chown=nexusbridgehub:nexusbridgehub ~/.ssh /home/nexusbridgehub
 ```
 
-Дальше — под пользователем `nexusbridge`:
+Дальше — под пользователем `nexusbridgehub`:
 
 ```bash
-ssh nexusbridge@YOUR_VPS_IP
+ssh nexusbridgehub@YOUR_VPS_IP
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y python3 python3-pip python3-venv curl ufw
 ```
@@ -90,24 +90,24 @@ openssl rand -hex 32
 
 ---
 
-## 4. Установка NexusBridge
+## 4. Установка NexusBridgeHub
 
 ```bash
-sudo mkdir -p /opt/nexusbridge
-sudo chown nexusbridge:nexusbridge /opt/nexusbridge
-cd /opt/nexusbridge
+sudo mkdir -p /opt/nexusbridgehub
+sudo chown nexusbridgehub:nexusbridgehub /opt/nexusbridgehub
+cd /opt/nexusbridgehub
 
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
-pip install "nexusbridge>=0.1.0"
+pip install "nexusbridgehub>=0.1.0"
 ```
 
 Проверка:
 
 ```bash
-which nexusbridge-server
-# /opt/nexusbridge/.venv/bin/nexusbridge-server
+which nexusbridgehub-server
+# /opt/nexusbridgehub/.venv/bin/nexusbridgehub-server
 ```
 
 ---
@@ -117,30 +117,30 @@ which nexusbridge-server
 Секрет храни в отдельном файле (права только root):
 
 ```bash
-sudo bash -c 'cat > /etc/nexusbridge.env << EOF
-NEXUSBRIDGE_JWT_SECRET=ВСТАВЬ_СЮДА_СЕКРЕТ_64_HEX_СИМВОЛА
-NEXUSBRIDGE_PORT=8765
+sudo bash -c 'cat > /etc/nexusbridgehub.env << EOF
+NEXUSBRIDGEHUB_JWT_SECRET=ВСТАВЬ_СЮДА_СЕКРЕТ_64_HEX_СИМВОЛА
+NEXUSBRIDGEHUB_PORT=8765
 EOF'
-sudo chmod 600 /etc/nexusbridge.env
-sudo chown root:root /etc/nexusbridge.env
+sudo chmod 600 /etc/nexusbridgehub.env
+sudo chown root:root /etc/nexusbridgehub.env
 ```
 
 Unit-файл:
 
 ```bash
-sudo tee /etc/systemd/system/nexusbridge.service << 'EOF'
+sudo tee /etc/systemd/system/nexusbridgehub.service << 'EOF'
 [Unit]
-Description=NexusBridge WebSocket server
+Description=NexusBridgeHub WebSocket server
 After=network-online.target
 Wants=network-online.target
 
 [Service]
 Type=simple
-User=nexusbridge
-Group=nexusbridge
-WorkingDirectory=/opt/nexusbridge
-EnvironmentFile=/etc/nexusbridge.env
-ExecStart=/opt/nexusbridge/.venv/bin/nexusbridge-server --host 127.0.0.1 --port 8765
+User=nexusbridgehub
+Group=nexusbridgehub
+WorkingDirectory=/opt/nexusbridgehub
+EnvironmentFile=/etc/nexusbridgehub.env
+ExecStart=/opt/nexusbridgehub/.venv/bin/nexusbridgehub-server --host 127.0.0.1 --port 8765
 Restart=on-failure
 RestartSec=5
 
@@ -153,8 +153,8 @@ EOF
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable --now nexusbridge
-sudo systemctl status nexusbridge
+sudo systemctl enable --now nexusbridgehub
+sudo systemctl status nexusbridgehub
 ```
 
 В логах должно быть:
@@ -163,7 +163,7 @@ sudo systemctl status nexusbridge
 starting on ws://127.0.0.1:8765
 ```
 
-Логи: `journalctl -u nexusbridge -f`
+Логи: `journalctl -u nexusbridgehub -f`
 
 ---
 
@@ -201,7 +201,7 @@ sudo apt install -y nginx certbot python3-certbot-nginx
 ```
 
 ```bash
-sudo tee /etc/nginx/sites-available/nexusbridge << 'EOF'
+sudo tee /etc/nginx/sites-available/nexusbridgehub << 'EOF'
 server {
     listen 80;
     server_name bridge.example.com;
@@ -218,7 +218,7 @@ server {
 }
 EOF
 
-sudo ln -sf /etc/nginx/sites-available/nexusbridge /etc/nginx/sites-enabled/
+sudo ln -sf /etc/nginx/sites-available/nexusbridgehub /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 sudo certbot --nginx -d bridge.example.com
 ```
@@ -237,10 +237,10 @@ wss://bridge.example.com
 
 ### Бот (контроллер) на VPS
 
-Тот же секрет, что в `/etc/nexusbridge.env`:
+Тот же секрет, что в `/etc/nexusbridgehub.env`:
 
 ```bash
-export NEXUSBRIDGE_JWT_SECRET="тот_же_секрет"
+export NEXUSBRIDGEHUB_JWT_SECRET="тот_же_секрет"
 ```
 
 ```python
@@ -266,7 +266,7 @@ bridge = BridgeClient(
 Или тонкий клиент:
 
 ```bash
-nexusbridge-worker --server-url wss://bridge.example.com --pair-code ABCD1234
+nexusbridgehub-worker --server-url wss://bridge.example.com --pair-code ABCD1234
 ```
 
 ---
@@ -276,14 +276,14 @@ nexusbridge-worker --server-url wss://bridge.example.com --pair-code ABCD1234
 ### 8.1 Сервис жив
 
 ```bash
-sudo systemctl is-active nexusbridge
+sudo systemctl is-active nexusbridgehub
 curl -I https://bridge.example.com   # от Caddy/Nginx — не 502
 ```
 
 ### 8.2 WebSocket с VPS
 
 ```bash
-source /opt/nexusbridge/.venv/bin/activate
+source /opt/nexusbridgehub/.venv/bin/activate
 pip install websockets
 python3 << 'PY'
 import asyncio, websockets
@@ -303,10 +303,10 @@ PY
 ## 9. Обновление
 
 ```bash
-cd /opt/nexusbridge
+cd /opt/nexusbridgehub
 source .venv/bin/activate
-pip install --upgrade nexusbridge
-sudo systemctl restart nexusbridge
+pip install --upgrade nexusbridgehub
+sudo systemctl restart nexusbridgehub
 ```
 
 ---
@@ -315,7 +315,7 @@ sudo systemctl restart nexusbridge
 
 | ✓ | Действие |
 |---|----------|
-| ☐ | `NEXUSBRIDGE_JWT_SECRET` ≥ 32 символов, только на сервере и в боте |
+| ☐ | `NEXUSBRIDGEHUB_JWT_SECRET` ≥ 32 символов, только на сервере и в боте |
 | ☐ | Порт 8765 **не** открыт в firewall наружу |
 | ☐ | TLS (HTTPS/WSS) включён |
 | ☐ | SSH только по ключу, root login отключён |
@@ -327,10 +327,10 @@ sudo systemctl restart nexusbridge
 
 | Симптом | Решение |
 |---------|---------|
-| `502 Bad Gateway` | `systemctl status nexusbridge` — сервер не слушает 8765 |
+| `502 Bad Gateway` | `systemctl status nexusbridgehub` — сервер не слушает 8765 |
 | Worker не коннектится | Проверь `wss://`, не `ws://`; firewall 443 открыт |
-| `JWT secret must be at least 32 characters` | Удлини секрет в `/etc/nexusbridge.env` |
-| Pair-код не работает | Бот и сервер должны использовать **один** `NEXUSBRIDGE_JWT_SECRET` |
+| `JWT secret must be at least 32 characters` | Удлини секрет в `/etc/nexusbridgehub.env` |
+| Pair-код не работает | Бот и сервер должны использовать **один** `NEXUSBRIDGEHUB_JWT_SECRET` |
 | Certbot fails | DNS A-запись ещё не пропагировалась — подожди 5–30 мин |
 
 ---

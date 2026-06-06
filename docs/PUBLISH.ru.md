@@ -17,7 +17,7 @@
 
 1. Зарегистрируйся на [pypi.org](https://pypi.org/account/register/)
 2. Включи **2FA** (обязательно для загрузки)
-3. Проверь, что имя **`nexusbridge`** свободно: [pypi.org/project/nexusbridge](https://pypi.org/project/nexusbridge/)
+3. Проверь, что имя **`nexusbridgehub`** свободно: [pypi.org/project/nexusbridgehub](https://pypi.org/project/nexusbridgehub/)
 
 ## 2. Trusted Publisher (рекомендуется)
 
@@ -25,9 +25,9 @@
 
 1. PyPI → Account → **Publishing** → **Add a new pending publisher**
 2. Заполни:
-   - **PyPI Project Name:** `nexusbridge` (или оставь пустым для первого upload)
+   - **PyPI Project Name:** `nexusbridgehub` (или оставь пустым для первого upload)
    - **Owner:** `rxzwu`
-   - **Repository name:** `nexusbridge`
+   - **Repository name:** `nexusbridgehub`
    - **Workflow name:** `publish.yml`
    - **Environment name:** `pypi`
 3. Сохрани
@@ -46,7 +46,7 @@ python -m twine check dist/*
 
 ## 4. Релиз через GitHub (автоматически)
 
-1. Обнови версию в **`src/nexusbridge/__init__.py`** (`__version__`) — `pyproject.toml` подхватит её автоматически
+1. Обнови версию в **`src/nexusbridgehub/__init__.py`** (`__version__`) — `pyproject.toml` подхватит её автоматически
 2. Допиши **`CHANGELOG.md`**
 3. Закоммить, запушить в `main`
 4. GitHub → **Releases** → **Draft a new release**
@@ -59,7 +59,7 @@ python -m twine check dist/*
 
 ```bash
 python -m build
-python -m twine upload dist/nexusbridge-0.1.0*
+python -m twine upload dist/nexusbridgehub-0.1.0*
 ```
 
 Потребуются API token PyPI (`pypi-...`) в переменной `TWINE_PASSWORD`, username `__token__`.
@@ -67,8 +67,8 @@ python -m twine upload dist/nexusbridge-0.1.0*
 ## 6. После публикации
 
 ```bash
-pip install nexusbridge
-nexusbridge-server --help
+pip install nexusbridgehub
+nexusbridgehub-server --help
 ```
 
 Badge **PyPI version** в README обновится в течение нескольких минут.
@@ -79,4 +79,4 @@ Badge **PyPI version** в README обновится в течение неско
 - **MINOR** (0.2.0): новые фичи без ломающих изменений
 - **MAJOR** (1.0.0): breaking changes
 
-Один источник версии: `src/nexusbridge/__init__.py` → `__version__`.
+Один источник версии: `src/nexusbridgehub/__init__.py` → `__version__`.

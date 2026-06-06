@@ -13,8 +13,8 @@ import jwt
 import websockets
 from websockets.asyncio.server import ServerConnection
 
-from nexusbridge.auth import AuthManager
-from nexusbridge.protocol import (
+from nexusbridgehub.auth import AuthManager
+from nexusbridgehub.protocol import (
     BridgeMessage,
     MessageType,
     Role,
@@ -22,9 +22,9 @@ from nexusbridge.protocol import (
     register_payload,
     result_payload,
 )
-from nexusbridge.utils import dumps_message, loads_message, setup_logging
+from nexusbridgehub.utils import dumps_message, loads_message, setup_logging
 
-_log = logging.getLogger("nexusbridge.server")
+_log = logging.getLogger("nexusbridgehub.server")
 
 
 @dataclass(slots=True)
@@ -279,13 +279,13 @@ class BridgeServer:
 
 
 def main_cli() -> None:
-    parser = argparse.ArgumentParser(description="NexusBridge server")
+    parser = argparse.ArgumentParser(description="NexusBridgeHub server")
     parser.add_argument("--host", default="0.0.0.0")
-    parser.add_argument("--port", type=int, default=int(os.getenv("NEXUSBRIDGE_PORT", "8765")))
-    parser.add_argument("--secret", default=os.getenv("NEXUSBRIDGE_JWT_SECRET", ""))
+    parser.add_argument("--port", type=int, default=int(os.getenv("NEXUSBRIDGEHUB_PORT", "8765")))
+    parser.add_argument("--secret", default=os.getenv("NEXUSBRIDGEHUB_JWT_SECRET", ""))
     args = parser.parse_args()
     if not args.secret:
-        raise SystemExit("Set NEXUSBRIDGE_JWT_SECRET or pass --secret")
+        raise SystemExit("Set NEXUSBRIDGEHUB_JWT_SECRET or pass --secret")
 
     setup_logging()
     auth = AuthManager(args.secret)

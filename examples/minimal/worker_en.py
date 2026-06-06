@@ -9,7 +9,7 @@ import sys
 
 from _bootstrap import DEFAULT_PROJECT_ID, DEFAULT_SERVER_URL, USER_EN
 
-from nexusbridge.client import BridgeClient
+from nexusbridgehub.client import BridgeClient
 
 
 async def say_hello(name: str) -> str:
@@ -21,7 +21,7 @@ async def worker_info() -> dict:
 
 
 async def main() -> None:
-    token = os.getenv("WORKER_TOKEN_EN", os.getenv("NEXUSBRIDGE_TOKEN", ""))
+    token = os.getenv("WORKER_TOKEN_EN", os.getenv("NEXUSBRIDGEHUB_TOKEN", ""))
     if not token:
         print(
             "Set WORKER_TOKEN_EN (see generate_tokens.py).",

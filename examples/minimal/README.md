@@ -13,10 +13,10 @@ Two workers with different `user_id` values prove that the server routes command
 ## Quick run
 
 ```bash
-export NEXUSBRIDGE_JWT_SECRET="local-dev-secret-key-32chars-minimum!!"
+export NEXUSBRIDGEHUB_JWT_SECRET="local-dev-secret-key-32chars-minimum!!"
 
 # Terminal 1
-nexusbridge-server --host 127.0.0.1 --port 8765
+nexusbridgehub-server --host 127.0.0.1 --port 8765
 
 # Terminal 2
 python examples/minimal/generate_tokens.py

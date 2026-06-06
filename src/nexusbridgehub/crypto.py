@@ -13,7 +13,7 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
 
-_SALT_PREFIX: Final = b"nexusbridge:v1:"
+_SALT_PREFIX: Final = b"nexusbridgehub:v1:"
 _PBKDF2_ITERATIONS: Final = 480_000
 
 
@@ -63,7 +63,7 @@ def decrypt_server_url(encrypted: str, build_seed: bytes) -> str:
 
 def obfuscate_seed(seed: bytes) -> bytes:
     """Split seed into XOR-masked chunks for embedding (light obfuscation layer)."""
-    mask = hashlib.sha256(b"nexusbridge:mask").digest()
+    mask = hashlib.sha256(b"nexusbridgehub:mask").digest()
     return bytes(b ^ mask[i % len(mask)] for i, b in enumerate(seed))
 
 

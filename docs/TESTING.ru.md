@@ -1,4 +1,4 @@
-# Проверка NexusBridge (минимальный тест)
+# Проверка NexusBridgeHub (минимальный тест)
 
 Пошаговая инструкция: сервер + два воркера (RU/EN) + контроллеры.  
 Убедись, что мост работает **до** интеграции в боевой проект.
@@ -38,7 +38,7 @@ pip install -e ".[dev]"
 Секрет (один на все терминалы этой сессии):
 
 ```powershell
-$env:NEXUSBRIDGE_JWT_SECRET = "local-dev-secret-key-32chars-minimum!!"
+$env:NEXUSBRIDGEHUB_JWT_SECRET = "local-dev-secret-key-32chars-minimum!!"
 ```
 
 ---
@@ -48,8 +48,8 @@ $env:NEXUSBRIDGE_JWT_SECRET = "local-dev-secret-key-32chars-minimum!!"
 ```powershell
 cd C:\need\NexusBridgeSwag
 .\.venv\Scripts\Activate.ps1
-$env:NEXUSBRIDGE_JWT_SECRET = "local-dev-secret-key-32chars-minimum!!"
-nexusbridge-server --host 127.0.0.1 --port 8765
+$env:NEXUSBRIDGEHUB_JWT_SECRET = "local-dev-secret-key-32chars-minimum!!"
+nexusbridgehub-server --host 127.0.0.1 --port 8765
 ```
 
 Оставь окно открытым.
@@ -61,7 +61,7 @@ nexusbridge-server --host 127.0.0.1 --port 8765
 ```powershell
 cd C:\need\NexusBridgeSwag
 .\.venv\Scripts\Activate.ps1
-$env:NEXUSBRIDGE_JWT_SECRET = "local-dev-secret-key-32chars-minimum!!"
+$env:NEXUSBRIDGEHUB_JWT_SECRET = "local-dev-secret-key-32chars-minimum!!"
 python examples\minimal\generate_tokens.py
 ```
 
@@ -151,10 +151,10 @@ worker_info -> {'locale': 'en', 'user_id': 'user-en', 'status': 'online'}
 ## bash (Linux / macOS)
 
 ```bash
-export NEXUSBRIDGE_JWT_SECRET="local-dev-secret-key-32chars-minimum!!"
+export NEXUSBRIDGEHUB_JWT_SECRET="local-dev-secret-key-32chars-minimum!!"
 
 # T1
-nexusbridge-server --host 127.0.0.1 --port 8765
+nexusbridgehub-server --host 127.0.0.1 --port 8765
 
 # T2
 python examples/minimal/generate_tokens.py

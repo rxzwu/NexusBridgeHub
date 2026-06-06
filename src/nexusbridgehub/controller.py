@@ -9,10 +9,10 @@ from typing import Any
 import websockets
 from websockets.asyncio.client import ClientConnection
 
-from nexusbridge.protocol import BridgeMessage, MessageType, Role, invoke_payload, register_payload
-from nexusbridge.utils import dumps_message, loads_message
+from nexusbridgehub.protocol import BridgeMessage, MessageType, Role, invoke_payload, register_payload
+from nexusbridgehub.utils import dumps_message, loads_message
 
-_log = logging.getLogger("nexusbridge.controller")
+_log = logging.getLogger("nexusbridgehub.controller")
 
 
 class BridgeController:

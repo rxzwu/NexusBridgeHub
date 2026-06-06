@@ -11,12 +11,12 @@ from typing import Any
 
 import websockets
 
-from nexusbridge.client import BridgeClient
-from nexusbridge.crypto import deobfuscate_seed, decrypt_server_url
-from nexusbridge.protocol import BridgeMessage, MessageType
-from nexusbridge.utils import dumps_message, format_error, loads_message, setup_logging
+from nexusbridgehub.client import BridgeClient
+from nexusbridgehub.crypto import deobfuscate_seed, decrypt_server_url
+from nexusbridgehub.protocol import BridgeMessage, MessageType
+from nexusbridgehub.utils import dumps_message, format_error, loads_message, setup_logging
 
-_log = logging.getLogger("nexusbridge.worker_app")
+_log = logging.getLogger("nexusbridgehub.worker_app")
 
 
 class WorkerApp:
@@ -60,7 +60,7 @@ class WorkerApp:
             return self._server_url
         if self._encrypted and self._build_seed:
             return decrypt_server_url(self._encrypted, self._build_seed)
-        env = os.getenv("NEXUSBRIDGE_SERVER_URL", "")
+        env = os.getenv("NEXUSBRIDGEHUB_SERVER_URL", "")
         if env:
             return env
         raise RuntimeError("server URL not configured")
@@ -96,7 +96,7 @@ class WorkerApp:
             token=self.token,
             project_id=self.project_id,
             user_id=self.user_id,
-            metadata={"client": "nexusbridge-worker"},
+            metadata={"client": "nexusbridgehub-worker"},
             reconnect_delay=self.reconnect_delay,
             stop_event=self._stop,
         )
@@ -131,7 +131,7 @@ class WorkerApp:
 def _load_embedded_config() -> tuple[str | None, bytes | None]:
     """Populated by builder into worker_bundle.py at compile time."""
     try:
-        from nexusbridge.worker_bundle import ENCRYPTED_SERVER_URL, OBFUSCATED_BUILD_SEED  # type: ignore
+        from nexusbridgehub.worker_bundle import ENCRYPTED_SERVER_URL, OBFUSCATED_BUILD_SEED  # type: ignore
 
         seed = deobfuscate_seed(OBFUSCATED_BUILD_SEED)
         return ENCRYPTED_SERVER_URL, seed
@@ -140,12 +140,12 @@ def _load_embedded_config() -> tuple[str | None, bytes | None]:
 
 
 def main_cli() -> None:
-    parser = argparse.ArgumentParser(description="NexusBridge worker (thin client)")
-    parser.add_argument("--server-url", default=os.getenv("NEXUSBRIDGE_SERVER_URL", ""))
-    parser.add_argument("--project-id", default=os.getenv("NEXUSBRIDGE_PROJECT_ID", "taskrelay"))
-    parser.add_argument("--user-id", default=os.getenv("NEXUSBRIDGE_USER_ID", ""))
-    parser.add_argument("--token", default=os.getenv("NEXUSBRIDGE_TOKEN", ""))
-    parser.add_argument("--pair-code", default=os.getenv("NEXUSBRIDGE_PAIR_CODE", ""))
+    parser = argparse.ArgumentParser(description="NexusBridgeHub worker (thin client)")
+    parser.add_argument("--server-url", default=os.getenv("NEXUSBRIDGEHUB_SERVER_URL", ""))
+    parser.add_argument("--project-id", default=os.getenv("NEXUSBRIDGEHUB_PROJECT_ID", "taskrelay"))
+    parser.add_argument("--user-id", default=os.getenv("NEXUSBRIDGEHUB_USER_ID", ""))
+    parser.add_argument("--token", default=os.getenv("NEXUSBRIDGEHUB_TOKEN", ""))
+    parser.add_argument("--pair-code", default=os.getenv("NEXUSBRIDGEHUB_PAIR_CODE", ""))
     args = parser.parse_args()
 
     setup_logging()

@@ -11,16 +11,16 @@ from typing import Any
 import websockets
 from websockets.asyncio.client import ClientConnection
 
-from nexusbridge.protocol import (
+from nexusbridgehub.protocol import (
     BridgeMessage,
     MessageType,
     Role,
     register_payload,
     result_payload,
 )
-from nexusbridge.utils import dumps_message, format_error, loads_message
+from nexusbridgehub.utils import dumps_message, format_error, loads_message
 
-_log = logging.getLogger("nexusbridge.client")
+_log = logging.getLogger("nexusbridgehub.client")
 
 Handler = Callable[..., Any]
 AsyncHandler = Callable[..., Awaitable[Any]]

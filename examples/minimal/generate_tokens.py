@@ -8,17 +8,17 @@ import sys
 
 from _bootstrap import DEFAULT_PROJECT_ID, USER_EN, USER_RU
 
-from nexusbridge.auth import AuthManager
-from nexusbridge.protocol import Role
+from nexusbridgehub.auth import AuthManager
+from nexusbridgehub.protocol import Role
 
 
 def _require_secret() -> str:
-    secret = os.getenv("NEXUSBRIDGE_JWT_SECRET", "")
+    secret = os.getenv("NEXUSBRIDGEHUB_JWT_SECRET", "")
     if len(secret) < 32:
         print(
-            "Задай NEXUSBRIDGE_JWT_SECRET (минимум 32 символа).\n"
-            "PowerShell: $env:NEXUSBRIDGE_JWT_SECRET=\"твой_длинный_секрет_32plus\"\n"
-            "bash:       export NEXUSBRIDGE_JWT_SECRET=\"твой_длинный_секрет_32plus\"",
+            "Задай NEXUSBRIDGEHUB_JWT_SECRET (минимум 32 символа).\n"
+            "PowerShell: $env:NEXUSBRIDGEHUB_JWT_SECRET=\"твой_длинный_секрет_32plus\"\n"
+            "bash:       export NEXUSBRIDGEHUB_JWT_SECRET=\"твой_длинный_секрет_32plus\"",
             file=sys.stderr,
         )
         sys.exit(1)

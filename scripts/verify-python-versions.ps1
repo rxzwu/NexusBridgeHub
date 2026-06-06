@@ -1,4 +1,4 @@
-# Verify NexusBridge on Python 3.11–3.14 (one venv at a time, no lock contention).
+# Verify NexusBridgeHub on Python 3.11–3.14 (one venv at a time, no lock contention).
 $ErrorActionPreference = "Stop"
 Set-Location (Split-Path $PSScriptRoot -Parent)
 

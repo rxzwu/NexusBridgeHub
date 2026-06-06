@@ -3,7 +3,7 @@ requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "nexusbridge"
+name = "nexusbridgehub"
 dynamic = ["version"]
 description = "Universal bridge for distributed bot control: bot -> server -> user worker"
 readme = "README.md"
@@ -62,22 +62,22 @@ builder = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/rxzwu/nexusbridge"
-Documentation = "https://github.com/rxzwu/nexusbridge/blob/main/README.ru.md"
-Repository = "https://github.com/rxzwu/nexusbridge"
-Issues = "https://github.com/rxzwu/nexusbridge/issues"
-Changelog = "https://github.com/rxzwu/nexusbridge/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/rxzwu/nexusbridgehub"
+Documentation = "https://github.com/rxzwu/nexusbridgehub/blob/main/README.ru.md"
+Repository = "https://github.com/rxzwu/nexusbridgehub"
+Issues = "https://github.com/rxzwu/nexusbridgehub/issues"
+Changelog = "https://github.com/rxzwu/nexusbridgehub/blob/main/CHANGELOG.md"
 
 [project.scripts]
-nexusbridge-server = "nexusbridge.server:main_cli"
-nexusbridge-worker = "nexusbridge.worker_app:main_cli"
-nexusbridge-build = "nexusbridge.builder:main_cli"
+nexusbridgehub-server = "nexusbridgehub.server:main_cli"
+nexusbridgehub-worker = "nexusbridgehub.worker_app:main_cli"
+nexusbridgehub-build = "nexusbridgehub.builder:main_cli"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.dynamic]
-version = {attr = "nexusbridge.__version__"}
+version = {attr = "nexusbridgehub.__version__"}
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

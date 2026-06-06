@@ -1,4 +1,4 @@
-"""Wire protocol for NexusBridge: bot → server → worker."""
+"""Wire protocol for NexusBridgeHub: bot → server → worker."""
 
 from __future__ import annotations
 

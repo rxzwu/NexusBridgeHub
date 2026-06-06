@@ -1,8 +1,8 @@
-# NexusBridge
+# NexusBridgeHub
 
-[![PyPI version](https://img.shields.io/pypi/v/nexusbridge)](https://pypi.org/project/nexusbridge/)
-[![Python 3.11–3.14](https://img.shields.io/badge/python-3.11--3.14-blue.svg)](https://pypi.org/project/nexusbridge/)
-[![Tests](https://github.com/rxzwu/nexusbridge/actions/workflows/ci.yml/badge.svg)](https://github.com/rxzwu/nexusbridge/actions/workflows/ci.yml)
+[![PyPI version](https://img.shields.io/pypi/v/nexusbridgehub)](https://pypi.org/project/nexusbridgehub/)
+[![Python 3.11–3.14](https://img.shields.io/badge/python-3.11--3.14-blue.svg)](https://pypi.org/project/nexusbridgehub/)
+[![Tests](https://github.com/rxzwu/nexusbridgehub/actions/workflows/ci.yml/badge.svg)](https://github.com/rxzwu/nexusbridgehub/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Universal bridge for distributed bot control: **bot → server → user worker**.
@@ -24,7 +24,7 @@ Requires **Python 3.11+**. Check your version: `python --version`.
 
 ```
 ┌─────────────┐   JWT controller  ┌──────────────┐   JWT worker   ┌─────────────────┐
-│ Telegram    │ ────────────────► │ NexusBridge  │ ◄───────────── │ User Worker App │
+│ Telegram    │ ────────────────► │NexusBridgeHub│ ◄───────────── │ User Worker App │
 │ Bot / API   │                   │   Server     │                │ (local runtime) │
 └─────────────┘                   └──────────────┘                └─────────────────┘
 ```
@@ -41,19 +41,19 @@ Requires **Python 3.11+**. Check your version: `python --version`.
 - **JWT tokens** — workers and controllers authenticate with short-lived tokens (no hardcoded secrets in the app)
 - **Pair codes** — bot generates 8-char code; user enters it in the worker app → receives JWT
 - **Encrypted server URL** — WSS address stored as AES-256-GCM blob with PBKDF2 key derivation + machine fingerprint (not plain text in `.exe`)
-- **Thin client build** — `nexusbridge-build` generates per-build seed; combine with PyInstaller + optional commercial obfuscators
+- **Thin client build** — `nexusbridgehub-build` generates per-build seed; combine with PyInstaller + optional commercial obfuscators
 
 ## Error handling and logging
 
 - A failing **handler** does not crash the worker — the error is returned as `ok: false` and the worker keeps running
 - **Auto-reconnect** on WebSocket drops (`BridgeClient`, `WorkerApp`)
 - **Invalid messages** are logged and skipped; the session stays alive
-- Log level: `NEXUSBRIDGE_LOG_LEVEL=DEBUG` (default `INFO`)
+- Log level: `NEXUSBRIDGEHUB_LOG_LEVEL=DEBUG` (default `INFO`)
 
 ## Install
 
 ```bash
-pip install nexusbridge
+pip install nexusbridgehub
 # or from source
 pip install -e ".[dev]"
 ```
@@ -63,14 +63,14 @@ pip install -e ".[dev]"
 ### 1. Start server (VPS)
 
 ```bash
-export NEXUSBRIDGE_JWT_SECRET="your-48-char-minimum-secret-key-here"
-nexusbridge-server --host 0.0.0.0 --port 8765
+export NEXUSBRIDGEHUB_JWT_SECRET="your-48-char-minimum-secret-key-here"
+nexusbridgehub-server --host 0.0.0.0 --port 8765
 ```
 
 ### 2. Embed in your project (user's machine)
 
 ```python
-from nexusbridge import BridgeClient
+from nexusbridgehub import BridgeClient
 
 bridge = BridgeClient(
     server_url="wss://bridge.example.com:8765",
@@ -86,10 +86,10 @@ await bridge.run()
 ### 3. Bot side (controller on VPS)
 
 ```python
-from nexusbridge import AuthManager, BridgeController
-from nexusbridge.protocol import Role
+from nexusbridgehub import AuthManager, BridgeController
+from nexusbridgehub.protocol import Role
 
-auth = AuthManager(os.environ["NEXUSBRIDGE_JWT_SECRET"])
+auth = AuthManager(os.environ["NEXUSBRIDGEHUB_JWT_SECRET"])
 
 # Generate pair code for user (show in Telegram)
 code = auth.create_pair_code(project_id="taskrelay", user_id=str(user_id))
@@ -109,11 +109,11 @@ result = await ctrl.invoke("run_task", {"job_id": "job-42"})
 
 ```bash
 # User runs with pair code from bot (no server URL visible)
-nexusbridge-worker --pair-code ABCD1234
+nexusbridgehub-worker --pair-code ABCD1234
 
 # Build distributable .exe with encrypted server URL
-pip install nexusbridge[builder]
-nexusbridge-build --server-url wss://bridge.example.com:8765 --output-dir worker_dist
+pip install nexusbridgehub[builder]
+nexusbridgehub-build --server-url wss://bridge.example.com:8765 --output-dir worker_dist
 ```
 
 ## Per-user workers

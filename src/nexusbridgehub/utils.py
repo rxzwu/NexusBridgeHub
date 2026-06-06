@@ -10,7 +10,7 @@ from typing import Any
 
 def setup_logging(level: int | None = None) -> None:
     if level is None:
-        env = os.getenv("NEXUSBRIDGE_LOG_LEVEL", "INFO").upper()
+        env = os.getenv("NEXUSBRIDGEHUB_LOG_LEVEL", "INFO").upper()
         level = getattr(logging, env, logging.INFO)
     logging.basicConfig(
         level=level,

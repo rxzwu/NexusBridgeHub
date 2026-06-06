@@ -17,8 +17,8 @@ import sys
 # Allow running from repo without pip install
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from nexusbridge.client import BridgeClient
-from nexusbridge.worker_app import WorkerApp, main_cli
+from nexusbridgehub.client import BridgeClient
+from nexusbridgehub.worker_app import WorkerApp, main_cli
 
 
 def register_handlers(bridge: BridgeClient) -> None:
@@ -43,11 +43,11 @@ def register_handlers(bridge: BridgeClient) -> None:
 
 def build_app() -> WorkerApp:
     return WorkerApp(
-        server_url=os.getenv("NEXUSBRIDGE_SERVER_URL"),
-        project_id=os.getenv("NEXUSBRIDGE_PROJECT_ID", "taskrelay"),
-        user_id=os.getenv("NEXUSBRIDGE_USER_ID", ""),
-        token=os.getenv("NEXUSBRIDGE_TOKEN", ""),
-        pair_code=os.getenv("NEXUSBRIDGE_PAIR_CODE", ""),
+        server_url=os.getenv("NEXUSBRIDGEHUB_SERVER_URL"),
+        project_id=os.getenv("NEXUSBRIDGEHUB_PROJECT_ID", "taskrelay"),
+        user_id=os.getenv("NEXUSBRIDGEHUB_USER_ID", ""),
+        token=os.getenv("NEXUSBRIDGEHUB_TOKEN", ""),
+        pair_code=os.getenv("NEXUSBRIDGEHUB_PAIR_CODE", ""),
         register_fn=register_handlers,
     )
 

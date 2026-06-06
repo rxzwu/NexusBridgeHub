@@ -24,8 +24,8 @@ if sys.platform == "win32" and hasattr(sys.stdout, "reconfigure"):
     except Exception:
         pass
 
-from nexusbridge.client import BridgeClient
-from nexusbridge.worker_app import WorkerApp, main_cli
+from nexusbridgehub.client import BridgeClient
+from nexusbridgehub.worker_app import WorkerApp, main_cli
 
 
 def register_handlers(bridge: BridgeClient) -> None:
@@ -50,11 +50,11 @@ def register_handlers(bridge: BridgeClient) -> None:
 
 def build_app() -> WorkerApp:
     return WorkerApp(
-        server_url=os.getenv("NEXUSBRIDGE_SERVER_URL"),
-        project_id=os.getenv("NEXUSBRIDGE_PROJECT_ID", "taskrelay"),
-        user_id=os.getenv("NEXUSBRIDGE_USER_ID", ""),
-        token=os.getenv("NEXUSBRIDGE_TOKEN", ""),
-        pair_code=os.getenv("NEXUSBRIDGE_PAIR_CODE", ""),
+        server_url=os.getenv("NEXUSBRIDGEHUB_SERVER_URL"),
+        project_id=os.getenv("NEXUSBRIDGEHUB_PROJECT_ID", "taskrelay"),
+        user_id=os.getenv("NEXUSBRIDGEHUB_USER_ID", ""),
+        token=os.getenv("NEXUSBRIDGEHUB_TOKEN", ""),
+        pair_code=os.getenv("NEXUSBRIDGEHUB_PAIR_CODE", ""),
         register_fn=register_handlers,
     )
 
@@ -65,7 +65,7 @@ async def _main() -> None:
 
 
 if __name__ == "__main__":
-    # С аргументами CLI — тонкий клиент (nexusbridge-worker)
+    # С аргументами CLI — тонкий клиент (nexusbridgehub-worker)
     # Без аргументов — встраиваемый воркер с register_handlers
     if len(sys.argv) > 1:
         main_cli()

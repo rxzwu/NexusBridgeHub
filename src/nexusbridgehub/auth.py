@@ -9,7 +9,7 @@ from typing import Any
 
 import jwt
 
-from nexusbridge.protocol import Role
+from nexusbridgehub.protocol import Role
 
 
 @dataclass(frozen=True, slots=True)

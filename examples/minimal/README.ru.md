@@ -13,10 +13,10 @@
 ## Быстрый запуск
 
 ```powershell
-$env:NEXUSBRIDGE_JWT_SECRET = "local-dev-secret-key-32chars-minimum!!"
+$env:NEXUSBRIDGEHUB_JWT_SECRET = "local-dev-secret-key-32chars-minimum!!"
 
 # Терминал 1
-nexusbridge-server --host 127.0.0.1 --port 8765
+nexusbridgehub-server --host 127.0.0.1 --port 8765
 
 # Терминал 2
 python examples\minimal\generate_tokens.py

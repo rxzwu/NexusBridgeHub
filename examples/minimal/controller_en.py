@@ -9,7 +9,7 @@ import sys
 
 from _bootstrap import DEFAULT_PROJECT_ID, DEFAULT_SERVER_URL, USER_EN
 
-from nexusbridge.controller import BridgeController
+from nexusbridgehub.controller import BridgeController
 
 
 async def main() -> None:

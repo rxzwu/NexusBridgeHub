@@ -1,4 +1,4 @@
-"""Подключение nexusbridge из исходников репозитория (без pip install)."""
+"""Подключение nexusbridgehub из исходников репозитория (без pip install)."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ if sys.platform == "win32" and hasattr(sys.stdout, "reconfigure"):
         pass
 
 # Общие константы для минимального демо
-DEFAULT_SERVER_URL = os.getenv("NEXUSBRIDGE_SERVER_URL", "ws://127.0.0.1:8765")
-DEFAULT_PROJECT_ID = os.getenv("NEXUSBRIDGE_PROJECT_ID", "demo_project")
-USER_RU = os.getenv("NEXUSBRIDGE_USER_RU", "user-ru")
-USER_EN = os.getenv("NEXUSBRIDGE_USER_EN", "user-en")
+DEFAULT_SERVER_URL = os.getenv("NEXUSBRIDGEHUB_SERVER_URL", "ws://127.0.0.1:8765")
+DEFAULT_PROJECT_ID = os.getenv("NEXUSBRIDGEHUB_PROJECT_ID", "demo_project")
+USER_RU = os.getenv("NEXUSBRIDGEHUB_USER_RU", "user-ru")
+USER_EN = os.getenv("NEXUSBRIDGEHUB_USER_EN", "user-en")

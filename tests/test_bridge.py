@@ -1,4 +1,4 @@
-"""Integration tests for NexusBridge core loop."""
+"""Integration tests for NexusBridgeHub core loop."""
 
 from __future__ import annotations
 
@@ -8,13 +8,13 @@ import socket
 import pytest
 import websockets
 
-from nexusbridge.auth import AuthManager
-from nexusbridge.client import BridgeClient
-from nexusbridge.controller import BridgeController
-from nexusbridge.crypto import decrypt_server_url, encrypt_server_url, generate_build_seed
-from nexusbridge.protocol import BridgeMessage, MessageType, Role
-from nexusbridge.server import BridgeServer
-from nexusbridge.utils import dumps_message, loads_message
+from nexusbridgehub.auth import AuthManager
+from nexusbridgehub.client import BridgeClient
+from nexusbridgehub.controller import BridgeController
+from nexusbridgehub.crypto import decrypt_server_url, encrypt_server_url, generate_build_seed
+from nexusbridgehub.protocol import BridgeMessage, MessageType, Role
+from nexusbridgehub.server import BridgeServer
+from nexusbridgehub.utils import dumps_message, loads_message
 
 SECRET = "x" * 48 + "super-secret-bridge-key-2026"
 
