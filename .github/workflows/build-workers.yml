@@ -29,7 +29,7 @@ jobs:
             artifact_name: nexusbridgehub-worker
             asset_name: nexusbridgehub-worker-macos-amd64
             shell: bash
-          - os: ubuntu-20.04
+          - os: ubuntu-latest
             platform: linux
             artifact_name: nexusbridgehub-worker
             asset_name: nexusbridgehub-worker-linux-amd64

@@ -5,6 +5,14 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-06-12
+
+### Fixed
+
+- Replace unicode symbols (✓) with ASCII ([OK]) in builder output for Windows compatibility
+- Fix UnicodeEncodeError on Windows CI when using cp1252 encoding
+- Switch from ubuntu-20.04 to ubuntu-latest in CI workflows for faster runner allocation
+
 ## [0.2.0] - 2026-06-11
 
 ### Added
@@ -48,5 +56,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI on Python 3.11–3.14
 - Documentation: README (EN/RU), DEPLOY.ru.md, TESTING.ru.md
 
+[0.2.1]: https://github.com/rxzwu/nexusbridgehub/releases/tag/v0.2.1
 [0.2.0]: https://github.com/rxzwu/nexusbridgehub/releases/tag/v0.2.0
 [0.1.0]: https://github.com/rxzwu/nexusbridgehub/releases/tag/v0.1.0
