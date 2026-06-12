@@ -103,7 +103,7 @@ jobs:
             Write-Error "Bundle not generated"
             exit 1
           }
-          Write-Output "✓ Bundle generated successfully"
+          Write-Output "[OK] Bundle generated successfully"
 
       - name: Test bundle generation (Unix)
         if: matrix.platform != 'windows'
@@ -114,7 +114,7 @@ jobs:
             echo "Bundle not generated"
             exit 1
           fi
-          echo "✓ Bundle generated successfully"
+          echo "[OK] Bundle generated successfully"
 
       - name: Test full build with handlers (Windows)
         if: matrix.platform == 'windows'
@@ -137,7 +137,7 @@ jobs:
             exit 1
           }
           $size = (Get-Item ./test-full/dist/test-worker.exe).Length / 1MB
-          Write-Output "✓ Binary built: $([math]::Round($size, 1)) MB"
+          Write-Output "[OK] Binary built: $([math]::Round($size, 1)) MB"
           & ./test-full/dist/test-worker.exe --help
 
       - name: Verify binary (Unix)
@@ -149,6 +149,6 @@ jobs:
             exit 1
           fi
           size=$(du -h ./test-full/dist/test-worker | cut -f1)
-          echo "✓ Binary built: $size"
+          echo "[OK] Binary built: $size"
           chmod +x ./test-full/dist/test-worker
           ./test-full/dist/test-worker --help

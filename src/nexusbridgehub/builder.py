@@ -257,9 +257,9 @@ def main_cli() -> None:
             server_url=args.server_url,
             register_code=register_code_str,
         )
-        print(f"✓ Bundle written to {out / 'worker_bundle.py'}")
-        print(f"✓ Build seed saved to {out / 'build_seed.bin'}")
-        print(f"  Encrypted URL length: {len(enc)} bytes")
+        print(f"[OK] Bundle written to {out / 'worker_bundle.py'}")
+        print(f"[OK] Build seed saved to {out / 'build_seed.bin'}")
+        print(f"     Encrypted URL length: {len(enc)} bytes")
         print("\nTo build executable, run without --bundle-only")
         return
 
@@ -281,7 +281,7 @@ def main_cli() -> None:
         noconsole=args.noconsole,
     )
 
-    print(f"\n✓ Build successful: {exe}")
-    print(f"  Size: {exe.stat().st_size / 1024 / 1024:.1f} MB")
-    print(f"  Build seed: {out / 'build_seed.bin'}")
-    print("\nDistribute the executable to users — no Python installation required!")
+    print(f"\n[OK] Build successful: {exe}")
+    print(f"     Size: {exe.stat().st_size / 1024 / 1024:.1f} MB")
+    print(f"     Build seed: {out / 'build_seed.bin'}")
+    print("\nDistribute the executable to users -- no Python installation required!")
